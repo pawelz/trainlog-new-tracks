@@ -25,7 +25,7 @@ parser = argparse.ArgumentParser(description="Generates a map of new tracks take
 parser.add_argument('--input_file', required=True, help="Path to the input CSV file.")
 parser.add_argument('--since_day', required=True, help="The date to consider new tracks from (YYYY-MM-DD).")
 parser.add_argument('--output_file', default='new_tracks.csv', help="Path to the output CSV file (default: new_tracks.csv).")
-parser.add_argument('--trip_types', nargs='+', default=['train'], help="One or more trip types to include (default: train).")
+parser.add_argument('--trip_types', default='train', help="A comma-separated list of trip types to include (default: train).")
 args = parser.parse_args()
 
 # Check if output file exists to avoid overwriting
@@ -41,8 +41,11 @@ except FileNotFoundError:
 
 print(f"Total records loaded: {len(df)}")
 
+# Process trip_types argument
+trip_types_list = (item.strip() for item in args.trip_types.split(','))
+
 # Filter for specified trip types
-df_filtered = df[df['type'].isin(args.trip_types)].copy()
+df_filtered = df[df['type'].isin(trip_types_list)].copy()
 
 # Delete the original DataFrame to save memory
 del df
