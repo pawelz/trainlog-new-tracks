@@ -13,6 +13,7 @@
 #   limitations under the License.
 
 import polyline
+from math import radians, sin, cos, sqrt, asin
 import json
 from shapely.geometry import LineString, MultiLineString
 from shapely.ops import unary_union
@@ -192,6 +193,27 @@ def encode_linestring_to_polyline(linestring):
     coords_lat_lon = [(lat, lon) for lon, lat in linestring.coords]
     return polyline.encode(coords_lat_lon)
 
+def calculate_length_from_geometry(linestring):
+    """Calculates the length of a LineString in meters using the Haversine formula."""
+    if linestring.geom_type != 'LineString' or len(linestring.coords) < 2:
+        return 0.0
+
+    total_distance = 0.0
+    # Iterate over pairs of coordinates
+    for i in range(len(linestring.coords) - 1):
+        lon1, lat1 = linestring.coords[i]
+        lon2, lat2 = linestring.coords[i+1]
+
+        # Convert decimal degrees to radians
+        lon1, lat1, lon2, lat2 = map(radians, [lon1, lat1, lon2, lat2])
+
+        # Haversine formula
+        dlon = lon2 - lon1
+        dlat = lat2 - lat1
+        a = sin(dlat/2)**2 + cos(lat1) * cos(lat2) * sin(dlon/2)**2
+        total_distance += 2 * asin(sqrt(a)) * 6371000  # Radius of Earth in meters
+    return total_distance
+
 # Get original column names from the input file
 original_columns = pd.read_csv(args.input_file, nrows=0).columns.tolist()
 
@@ -204,6 +226,7 @@ for item in final_new_routes_with_metadata:
     if encoded_path:
         # Create a dictionary from the original trip's data
         new_route_dict = item['original_trip'].to_dict()
+        new_route_dict['trip_length'] = calculate_length_from_geometry(item['geometry'])
         # Overwrite the path with the new segment's polyline
         new_route_dict['path'] = encoded_path
         new_routes_data.append(new_route_dict)
