@@ -1,8 +1,8 @@
 # trainlog-new-tracks
 
-Generates a map of new tracks taken since date
+Generates a map of new tracks taken since date.
 
-# Dependencies
+## Dependencies
 
 You will need the following libraries: polyline, shapely, pandas. Try:
 
@@ -16,7 +16,7 @@ If that doesn't work, try:
 $ pip3 install polyline shapely pandas
 ```
 
-# How to use it
+## How to use it
 
 1. Export your data from trainlog, save it in a file `trainlog_export.csv`.
 2. Run
@@ -29,7 +29,7 @@ $ pip3 install polyline shapely pandas
 Note that the data in dev.trainlog.me is ocasionally cleared, so don't rely on
 any data stored there! Keep your csv file so that you can reupload it later.
 
-# Commandline flags
+## Commandline flags
 
 -   `--input_file`: **(Required)** The path to the input CSV file exported from trainlog.
 -   `--since_day`: **(Required)** The cutoff date in `YYYY-MM-DD` format. Trips on or after this date will be considered "new".
