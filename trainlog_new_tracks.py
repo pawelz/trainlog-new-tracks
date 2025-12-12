@@ -221,15 +221,25 @@ new_routes_data = []
 
 print(f"Processing {len(final_new_routes_with_metadata)} new route geometries...")
 
+MIN_LENGTH_METERS = 100
+
 for item in final_new_routes_with_metadata:
-    encoded_path = encode_linestring_to_polyline(item['geometry'])
-    if encoded_path:
-        # Create a dictionary from the original trip's data
-        new_route_dict = item['original_trip'].to_dict()
-        new_route_dict['trip_length'] = calculate_length_from_geometry(item['geometry'])
-        # Overwrite the path with the new segment's polyline
-        new_route_dict['path'] = encoded_path
-        new_routes_data.append(new_route_dict)
+    new_length = calculate_length_from_geometry(item['geometry'])
+
+    # Only include segments that meet the minimum length requirement
+    if new_length >= MIN_LENGTH_METERS:
+        encoded_path = encode_linestring_to_polyline(item['geometry'])
+        if encoded_path:
+            # Create a dictionary from the original trip's data
+            new_route_dict = item['original_trip'].to_dict()
+            new_route_dict['trip_length'] = new_length
+            # Overwrite the path with the new segment's polyline
+            new_route_dict['path'] = encoded_path
+            new_routes_data.append(new_route_dict)
+
+dropped_count = len(final_new_routes_with_metadata) - len(new_routes_data)
+if dropped_count > 0:
+    print(f"Dropped {dropped_count} segments shorter than {MIN_LENGTH_METERS}m.")
 
 df_new_routes = pd.DataFrame(new_routes_data)
 df_new_routes = df_new_routes[original_columns]  # Ensure original column order
