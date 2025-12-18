@@ -9,6 +9,10 @@ You will need the following libraries: polyline, shapely, pandas. Try:
 ```sh
 $ pip install polyline shapely pandas
 ```
+or
+```sh
+$ pip install -r requirements.txt
+```
 
 If that doesn't work, try:
 
